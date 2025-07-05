@@ -3,7 +3,7 @@
 <?= $this->section('content') ?>
     <h1>Our Flower Collection</h1>
     <div class="product-grid">
-        <?php if (! empty($products) && is_array($products)): ?>
+        <?php if (!empty($products) && is_array($products)): ?>
             <?php foreach ($products as $product): ?>
                 <div class="product-card">
                     <img src="<?= base_url('assets/img/' . $product->image) ?>" alt="<?= esc($product->name) ?>">
