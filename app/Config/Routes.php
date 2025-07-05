@@ -20,8 +20,8 @@ $routes->get('/', 'Home::index', ['as' => 'homepage']); // Home page
 $routes->get('about', 'Home::about', ['as' => 'about_us']); // About Us page// Contact Us page
 
 
-$routes->get('products', 'ProductController::index', ['as' => 'products_list']); // View all products
-$routes->get('products/(:num)', 'ProductController::show/$1', ['as' => 'product_detail']); // View single Product by ID
+$routes->get('products_details', 'ProductController::index', ['as' => 'products_list']); // View all products
+$routes->get('products_details/(:num)', 'User/ProductController::show/$1', ['as' => 'show']);
 
 
 $routes->get('Category', 'CategoryController::index', ['as' => 'categories_list_public']); // View all categories

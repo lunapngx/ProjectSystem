@@ -1,6 +1,4 @@
-<?php namespace App\Controllers\Admin;
-
-use App\Controllers\BaseController;
+<?php namespace App\Controllers;
 
 class Dashboard extends BaseController
 {

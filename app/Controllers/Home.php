@@ -23,4 +23,5 @@ class Home extends BaseController
 
         return view('Category/index', ['title' => 'CategoryModel']);
     }
+
 }

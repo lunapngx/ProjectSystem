@@ -21,13 +21,18 @@
         <input type="text" name="city"          placeholder="City"                 value="<?= set_value('city') ?>"><br><br>
         <input type="text" name="state"         placeholder="State"                value="<?= set_value('state') ?>"><br><br>
         <input type="text" name="zip"           placeholder="ZIP Code"             value="<?= set_value('zip') ?>"><br><br>
-        <input type="text" name="country"       placeholder="Country"              value="<?= set_value('country') ?>"><br><br>
 
         <h3>3. Payment Method</h3>
         <label>
             <input type="radio" name="payment_method" value="cod"
                 <?= set_radio('payment_method','cod', true) ?>>
             Cash on Delivery
+        </label><br><br>
+
+        <label>
+            <input type="radio" name="payment_method" value="pickup"
+                <?= set_radio('payment_method', 'pickup') ?>>
+            Pick Up
         </label><br><br>
 
         <button type="submit">Place Order</button>
@@ -87,7 +92,7 @@
 <?= $this->endSection() ?>
 
 
-<?= $this->section('scripts') ?>
+<?= $this->section('scripts') ?>9
 <script>
     // any JS you need just on this page
 </script>

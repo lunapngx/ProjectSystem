@@ -3,6 +3,7 @@
 use App\Models\ProductModel;
 use App\Models\ReviewModel;
 use CodeIgniter\Controller;
+use CodeIgniter\Exceptions\PageNotFoundException;
 
 class ProductController extends Controller
 {
@@ -17,7 +18,7 @@ class ProductController extends Controller
     {
         $prodModel = new ProductModel();
         $product   = $prodModel->find($id)
-            ?? throw new \CodeIgniter\Exceptions\PageNotFoundException('Product not found');
+            ?? throw new PageNotFoundException('Product not found');
 
         // decode JSON arrays for the view
         $product['colors'] = json_decode($product['colors'], true);
@@ -26,7 +27,7 @@ class ProductController extends Controller
         $revModel = new ReviewModel();
         $reviews  = $revModel->where('product_id', $id)->findAll();
 
-        return view('Product/product_details', [
+        return view('Product/show', [
             'Product' => $product,
             'reviews' => $reviews
         ]);
