@@ -7,7 +7,7 @@ class CategoryModel extends Model
     protected $table            = 'categories';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
-    protected $returnType       = 'object';
+    protected $returnType = 'array'; // Changed to array for consistency with views
     protected $useSoftDeletes   = false;
 
     protected $allowedFields = [

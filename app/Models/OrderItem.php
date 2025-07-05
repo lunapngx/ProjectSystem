@@ -9,10 +9,17 @@ class OrderItem extends Model
     protected $table            = 'orderitems';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
-    protected $returnType       = 'array';
+    protected $returnType = 'array'; // Changed to array for consistency with views
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = [];
+    protected $allowedFields = [
+        'order_id', // Foreign key to orders table
+        'product_id', // Foreign key to products table
+        'quantity',
+        'price',
+        'subtotal', // Calculated subtotal for the item (quantity * price)
+        'options', // To store product options like color, size in JSON
+    ];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;

@@ -1,9 +1,14 @@
+<?php
+
+use App\Models\CategoryModel;
+
+?>
 <?= $this->extend('layout/main') ?>
 
 <?= $this->section('title') ?>Categories<?= $this->endSection() ?>
 
 <?= $this->section('styles') ?>
-    <link rel="stylesheet" href="<?= base_url('assets/css/Category.css') ?>">
+    <link rel="stylesheet" href="<?= base_url('public/assets/css/Category.css') ?>">
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
@@ -12,11 +17,17 @@
             <h3>Category</h3>
             <nav class="category-list">
                 <ul>
-                    <?php if (!empty($categories)): ?>
-                        <?php foreach ($categories as $cat): ?>
+                    <?php
+                    // Fetch all categories for the sidebar if 'categories' isn't passed from controller
+                    // This assumes CategoryModel is available globally or passed
+                    $categoryModel = new CategoryModel();
+                    $allCategories = $categoryModel->findAll();
+                    ?>
+                    <?php if (!empty($allCategories)): ?>
+                        <?php foreach ($allCategories as $cat): ?>
                             <li>
-                                <a href="<?= url_to('products_by_category_slug', $cat->slug ?? $cat->id) ?>">
-                                    <?= esc($cat->name) ?> <i class="bi bi-chevron-right"></i>
+                                <a href="<?= url_to('products_by_category_slug', $cat['slug'] ?? $cat['id']) ?>">
+                                    <?= esc($cat['name']) ?> <i class="bi bi-chevron-right"></i>
                                 </a>
                             </li>
                         <?php endforeach; ?>
@@ -39,21 +50,24 @@
                 </select>
             </div>
 
-            <?php if (!empty($products) && is_array($products)): ?>
+            <?php if (isset($products) && !empty($products) && is_array($products)): ?>
                 <div class="category-product-grid">
                     <?php foreach ($products as $product): ?>
                         <div class="product-card">
-                            <a href="<?= url_to('product_detail', $product->id) ?>">
+                            <a href="<?= url_to('product_detail', $product['id']) ?>">
                                 <div class="product-image">
-                                    <img src="<?= base_url('assets/img/' . $product->image) ?>" alt="<?= esc($product->name) ?>">
+                                    <img src="<?= base_url('public/assets/img/' . $product['image']) ?>"
+                                         alt="<?= esc($product['name']) ?>">
                                 </div>
                             </a>
                             <div class="product-info">
-                                <h3><a href="<?= url_to('product_detail', $product->id) ?>"><?= esc($product->name) ?></a></h3>
-                                <p class="price">₱<?= esc(number_format($product->price, 2)) ?></p>
+                                <h3>
+                                    <a href="<?= url_to('product_detail', $product['id']) ?>"><?= esc($product['name']) ?></a>
+                                </h3>
+                                <p class="price">₱<?= esc(number_format($product['price'], 2)) ?></p>
                                 <form action="<?= url_to('cart_add') ?>" method="post">
                                     <?= csrf_field() ?>
-                                    <input type="hidden" name="product_id" value="<?= esc($product->id) ?>">
+                                    <input type="hidden" name="product_id" value="<?= esc($product['id']) ?>">
                                     <input type="hidden" name="quantity" value="1">
                                     <button type="submit" class="btn-add-to-cart">Add to Cart</button>
                                 </form>

@@ -3,7 +3,7 @@
 <?= $this->section('title') ?>Your Cart<?= $this->endSection() ?>
 
 <?= $this->section('styles') ?>
-    <link rel="stylesheet" href="<?= base_url('assets/css/Cart.css') ?>">
+    <link rel="stylesheet" href="<?= base_url('public/assets/css/cart.css') ?>">
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
@@ -38,7 +38,8 @@
                         <th>PRICE</th>
                         <th>QUANTITY</th>
                         <th>TOTAL</th>
-                        <th></th> </tr>
+                        <th></th>
+                    </tr>
                     </thead>
                     <tbody>
                     <?php if (!empty($cartItems)): ?>
@@ -46,10 +47,11 @@
                             <tr>
                                 <td>
                                     <div class="product-info-cell">
-                                        <img src="<?= base_url('assets/img/' . esc($item->product->image)) ?>" alt="<?= esc($item->product->name) ?>" class="product-image-small">
+                                        <img src="<?= base_url('public/assets/img/' . esc($item->product['image'])) ?>"
+                                             alt="<?= esc($item->product['name']) ?>" class="product-image-small">
                                         <div>
-                                            <strong><?= esc($item->product->name) ?></strong>
-                                            <?php if (isset($item->options)): ?>
+                                            <strong><?= esc($item->product['name']) ?></strong>
+                                            <?php if (isset($item->options) && is_array($item->options)): ?>
                                                 <small>
                                                     <?php foreach($item->options as $key => $value): ?>
                                                         <?= esc(ucfirst($key)) ?>: <?= esc($value) ?>
@@ -59,23 +61,26 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td>₱<?= esc(number_format($item->product->price, 2)) ?></td>
+                                <td>₱<?= esc(number_format($item->product['price'], 2)) ?></td>
                                 <td>
-                                    <form action="<?= url_to('cart_update') ?>" method="post" class="d-inline">
+                                    <form action="<?= url_to('cart_update') ?>" method="post"
+                                          class="d-inline quantity-form">
                                         <?= csrf_field() ?>
-                                        <input type="hidden" name="product_id" value="<?= esc($item->product->id) ?>">
+                                        <input type="hidden" name="product_id" value="<?= esc($item->product['id']) ?>">
                                         <div class="quantity-controls">
                                             <button type="button" class="btn-minus">-</button>
-                                            <input type="number" name="quantity" value="<?= esc($item->quantity) ?>" min="1" max="<?= esc($item->product->stock) ?? 99 ?>" readonly>
+                                            <input type="number" name="quantity" value="<?= esc($item->quantity) ?>"
+                                                   min="1" max="<?= esc($item->product['stock'] ?? 99) ?>">
                                             <button type="button" class="btn-plus">+</button>
                                         </div>
-                                        <button type="submit" class="d-none">Update</button> </form>
+                                        <button type="submit" class="d-none update-item-btn">Update</button>
+                                    </form>
                                 </td>
                                 <td>₱<?= esc(number_format($item->itemTotal, 2)) ?></td>
                                 <td>
                                     <form action="<?= url_to('cart_remove') ?>" method="post" onsubmit="return confirm('Are you sure you want to remove this item?');">
                                         <?= csrf_field() ?>
-                                        <input type="hidden" name="product_id" value="<?= esc($item->product->id) ?>">
+                                        <input type="hidden" name="product_id" value="<?= esc($item->product['id']) ?>">
                                         <button type="submit" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></button>
                                     </form>
                                 </td>
@@ -91,7 +96,9 @@
 
                 <div class="cart-actions text-end py-3 px-3">
                     <a href="<?= url_to('products_list') ?>" class="btn btn-secondary">Continue Shopping</a>
-                    <button type="button" class="btn btn-primary" id="updateCartBtn">Update Cart</button>
+                    <button type="submit" form="updateAllCartItems" class="btn btn-primary" id="updateCartBtn">Update
+                        Cart
+                    </button>
                 </div>
             </div>
 
@@ -99,7 +106,6 @@
                 <h3>ORDER SUMMARY</h3>
                 <div>
                     <span>Subtotal</span>
-                    <!-- give this an ID so we can read it in JS -->
                     <span id="subtotal">₱<?= esc(number_format($total, 2)) ?></span>
                 </div>
                 <div class="shipping-options">
@@ -125,7 +131,6 @@
                 </div>
                 <div class="total">
                     <span>TOTAL</span>
-                    <!-- and this one so we can update the number -->
                     <span id="grandTotal">₱<?= esc(number_format($total + 40, 2)) ?></span>
                 </div>
                 <a href="<?= url_to('checkout_view') ?>" class="btn btn-proceed">
@@ -134,7 +139,12 @@
                 <a href="<?= url_to('products_list') ?>" class="btn btn-continue">
                     Continue Shopping <i class="bi bi-arrow-left"></i>
                 </a>
-                …
+                <div class="secure" style="text-align:center;margin-top:1rem;font-size:.9rem">
+                    🔒 Secure Checkout
+                    <div class="icons" style="font-size:1.5rem;margin-top:.5rem">
+                        💳 🏦 🅿️ 🍎
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -148,6 +158,9 @@
             const subtotalEl  = document.getElementById('subtotal');
             const totalEl     = document.getElementById('grandTotal');
             const shippingRad = document.querySelectorAll('input[name="shipping_method"]');
+
+            // quantity controls
+            const quantityForms = document.querySelectorAll('.quantity-form');
 
             // parse the ₱123.45 to a number
             const parsePeso = txt => parseFloat(txt.replace(/[^0-9.]/g,'')) || 0;
@@ -166,10 +179,46 @@
                         case 'pickup':
                             shipCost = 0;  break;
                         case 'free':
-                            shipCost = base > 300 ? 0 : 40;
+                            shipCost = base > 300 ? 0 : 40; // Assuming ₱300 is the free shipping threshold
                             break;
                     }
                     totalEl.textContent = fmtPeso(base + shipCost);
+                });
+            });
+
+            quantityForms.forEach(form => {
+                const quantityInput = form.querySelector('input[name="quantity"]');
+                const btnMinus = form.querySelector('.btn-minus');
+                const btnPlus = form.querySelector('.btn-plus');
+                const updateBtn = form.querySelector('.update-item-btn');
+
+                btnMinus.addEventListener('click', () => {
+                    let currentValue = parseInt(quantityInput.value);
+                    if (currentValue > parseInt(quantityInput.min)) {
+                        quantityInput.value = currentValue - 1;
+                        updateBtn.click(); // Trigger form submission
+                    }
+                });
+
+                btnPlus.addEventListener('click', () => {
+                    let currentValue = parseInt(quantityInput.value);
+                    if (currentValue < parseInt(quantityInput.max)) {
+                        quantityInput.value = currentValue + 1;
+                        updateBtn.click(); // Trigger form submission
+                    }
+                });
+
+                quantityInput.addEventListener('change', () => {
+                    let currentValue = parseInt(quantityInput.value);
+                    const min = parseInt(quantityInput.min);
+                    const max = parseInt(quantityInput.max);
+
+                    if (isNaN(currentValue) || currentValue < min) {
+                        quantityInput.value = min;
+                    } else if (currentValue > max) {
+                        quantityInput.value = max;
+                    }
+                    updateBtn.click(); // Trigger form submission
                 });
             });
         });
