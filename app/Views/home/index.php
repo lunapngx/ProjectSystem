@@ -55,10 +55,7 @@
                         </div>
                     </div>
                     <div class="product-info">
-                        <h3 class="product-title"><a href="<?= base_url('product_details/' . $product['id']) ?>">
-                                <?= esc($product['name']) ?>
-                            </a>
-                            Lorem ipsum dolor sit amet</a></h3>
+                        <h3 class="product-title"><a href="<?= base_url('productdetails') ?>">Lorem ipsum dolor sit amet</a></h3>
                         <div class="product-price">
                             <span class="current-price">$89.99</span>
                         </div>
